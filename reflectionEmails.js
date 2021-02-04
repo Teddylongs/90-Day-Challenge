@@ -1,6 +1,8 @@
 const fetch = require("node-fetch");
 const ObjectsToCsv = require("objects-to-csv");
 
+const DAY1 = 1610928000
+
 let emails = [];
 let allResponses;
 
@@ -42,19 +44,30 @@ const count_responses = (email_list) => {
   console.log(emailCount);
 };
 
-const getData = async (offset = 250, limit = 250) => {
-  await fetch(
-    `https://talk.hyvor.com/api/v1/comments?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&type=comments&limit=${limit}&offset=${offset}`
-  )
-    .then(
-      (res) => res.json() //return response data in JSON
-    )
-    .then((res) => {
-      console.log(res);
-      return res;
-    });
+//RETURN NUMBER OF DAYS BETWEEN TWO UNIX TIMESTAMPS
+var numDaysBetween = function(d1, d2) {
+  // console.log('today', today)
+  var diff = Math.abs(d1 - d2);
+  // console.log('diff', diff)
+  return Math.ceil(diff / (60 * 60 * 24));
 };
 
+
+const dateStamp = (timestamp) => {
+
+}
+
+const wordCount = (text) => {
+  var wordCount = 0;
+  for (var i = 0; i <= text.length; i++) {
+if (text.charAt(i) == ' ') {wordCount++;}
+}
+  if(wordCount >= 7 && wordCount <= 85){
+   return "yes"
+  }else {
+    return "no"
+  }
+}
 const getEmails = async (offset) => {
   await fetch(
     `https://talk.hyvor.com/api/v1/comments?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&type=comments&limit=250&offset=${offset}`
@@ -63,40 +76,36 @@ const getEmails = async (offset) => {
     .then((res) => {
       emails = res.data.map((user) => {
         return {
-          email: user.user.email,
-          unix_timestamp: user.created_at,
-          date_created: Date(user.created_at * 1000),
-          comment: user.markdown,
+          email: user.user.email ? user.user.email.toLowerCase() : "",
+          day: numDaysBetween(DAY1, user.created_at),
+          // unix_timestamp: user.created_at,
+          // date_created: new Date(user.created_at * 1000),
+          wallOfFaith: wordCount(user.markdown),
         };
       });
       return [
         emails,
         emails.map((email) => {
-          return {email: email.email};
+          return email.email ;
         }),
       ];
     })
     .then((emails) => {
-      console.log(emails[1]);
+      // console.log(emails[0]);
       const toCSV = async () => {
-        // console.log(emails[0].sort())
-        const csv = new ObjectsToCsv(emails[1]);
-        // console.log(emails[1]);
-        // count_responses(emails[1])
-        // console.log(emails[1].sort())
-        // Save to file:
-        
+        const csv = new ObjectsToCsv(emails[0]);
         await csv.toDisk(`./page${(offset/250)+1}.csv`, { allColumns: false });
-        // Return the CSV file as string:
-        // console.log(await csv.toString());
+
       };
 
       toCSV();
     });
 };
 
+//MILESTONES: 2250, 3250
+
 let i = 0
-while (i < 2334){
+while (i <=3500){
   try{
     getEmails(i)
     i +=  250
@@ -105,18 +114,8 @@ while (i < 2334){
   }
 
 }
-// let i = 0;
-// let isData = true;
-// let binLength = 0
-// let bin = []
-// while (isData) {
-//   bin = [...bin, getData(250 * i, 250)];
-//   i++;
-//   if(bin.length === binLength){
-//     break
-//   } else {
-//     binLength = bin.length
-//   }
-// }
 
-// console.log(bin)
+
+
+
+// numDaysBetween(DAY1, DAY1)
