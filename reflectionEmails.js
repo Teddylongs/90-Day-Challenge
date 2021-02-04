@@ -45,18 +45,14 @@ const count_responses = (email_list) => {
 };
 
 //RETURN NUMBER OF DAYS BETWEEN TWO UNIX TIMESTAMPS
-var numDaysBetween = function(d1, d2) {
+const numDaysBetween = function(d1, d2) {
   // console.log('today', today)
   var diff = Math.abs(d1 - d2);
   // console.log('diff', diff)
   return Math.ceil(diff / (60 * 60 * 24));
 };
 
-
-const dateStamp = (timestamp) => {
-
-}
-
+//WORD COUNTER USING SPACE BREAKS
 const wordCount = (text) => {
   var wordCount = 0;
   for (var i = 0; i <= text.length; i++) {
@@ -68,6 +64,7 @@ if (text.charAt(i) == ' ') {wordCount++;}
     return "no"
   }
 }
+
 const getEmails = async (offset) => {
   await fetch(
     `https://talk.hyvor.com/api/v1/comments?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&type=comments&limit=250&offset=${offset}`
@@ -94,7 +91,7 @@ const getEmails = async (offset) => {
       // console.log(emails[0]);
       const toCSV = async () => {
         const csv = new ObjectsToCsv(emails[0]);
-        await csv.toDisk(`./page${(offset/250)+1}.csv`, { allColumns: false });
+        await csv.toDisk(`./90-day-challenge.csv`, { allColumns: false , append: true});
 
       };
 
