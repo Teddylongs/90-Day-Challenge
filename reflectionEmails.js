@@ -1,9 +1,11 @@
 const fetch = require("node-fetch");
 const ObjectsToCsv = require("objects-to-csv");
+const dotenv = require("dotenv");
 
-const DAY1 = 1610928000;
+dotenv.config();
+API_KEY = process.env.API_KEY;
+WEBSITE_ID = process.env.WEBSITE_ID;
 
-let emails = [];
 let allResponses;
 
 function count_duplicate(a) {
@@ -84,8 +86,9 @@ const toStringCSV = async (array) => {
   return csv;
 };
 const getEmails = async (offset, data) => {
+  let emails = [];
   await fetch(
-    `https://talk.hyvor.com/api/v1/comments?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&type=comments&limit=250&offset=${offset}`
+    `https://talk.hyvor.com/api/v1/comments?website_id=${WEBSITE_ID}&api_key=${API_KEY}&type=comments&limit=250&offset=${offset}`
   )
     .then((res) => res.json())
     .then((res) => {
@@ -111,21 +114,65 @@ const getEmails = async (offset, data) => {
     });
 };
 
-
 const getPages = async () => {
-  const pages = await fetch(`https://talk.hyvor.com/api/v1/pages?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&sort=recently_commented`
-  ).then((res) => res.json())
-  .then(pages => 
-    pages.data
-  ).catch(err => {
-    console.log(err)
-  })
+  const pages = await fetch(
+    `https://talk.hyvor.com/api/v1/pages?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&sort=recently_commented`
+  )
+    .then((res) => res.json())
+    .then((pages) => pages.data)
+    .catch((err) => {
+      console.log(err);
+    });
 
-  return pages
+  return pages;
+};
+
+const getComments = async (offset = 0, page_identifier) => {
+  const comments = await fetch(
+    `https://talk.hyvor.com/api/v1/comments?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&type=comments&limit=250&offset=${offset}&page_identifier=${page_identifier}`
+  )
+    .then((res) => res.json())
+    .then((res) => {
+      const batch = res.data.map((user) => {
+        return {
+          email: user.user.email ? user.user.email.toLowerCase() : "",
+          // day_posted: numDaysBetween(DAY1, user.created_at),
+          // unix_timestamp: user.created_at,
+          // date_created: new Date(user.created_at * 1000),
+          day_posted: user.page.page_identifier,
+          wall_of_faith: wordCount(user.markdown),
+        };
+      });
+      return [
+        batch,
+        batch.map((email) => {
+          return email.email;
+        }),
+      ];
+    })
+    .then((emails) => {
+      return emails[0];
+    });
+// console.log(comments)
+  return comments;
+};
+
+ 
+const getAllComments = async (page_identifier, comment_count) => {
+  let i = 0
+  let commentsList = []
+  while (i < comment_count)  {
+    try {
+      const batch = await getComments(i, page_identifier)
+      commentsList = [...commentsList, batch]
+      i = i + 250
+    } catch (err){
+      console.log(err)
+    }
+    
+  }
+  return commentsList
 }
-
-
-
 //MILESTONES: 2250, 3250
 // const main = () => {
 //   let i = 0;
@@ -139,10 +186,24 @@ const getPages = async () => {
 //   }
 // };
 
-const main = async () => {
- const pages = await getPages()
- console.log(pages)
+const populatePageData = async (pages) => {
+  for (let i =0; i < pages.length; i++){
+    // console.log(pages[i])
+    pages[i].data = await getAllComments(pages[i].page_identifier, pages[i].comments_count)
+    console.log(pages[i].data)
+  }
+  // page.data = await getAllComments(page.page_identifier, page.comment_count)
+  // console.log(page.data)
+  console.log(pages)
 }
+
+const main = async () => {
+  let data = await getPages()
+  populatePageData(data) 
+
+  // const allComments = await getAllComments("day-1", 500)
+  // console.log(allComments)
+};
 
 main();
 
