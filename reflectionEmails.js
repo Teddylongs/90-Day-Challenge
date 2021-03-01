@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const ObjectsToCsv = require("objects-to-csv");
 
-const DAY1 = 1610928000
+const DAY1 = 1610928000;
 
 let emails = [];
 let allResponses;
@@ -45,7 +45,7 @@ const count_responses = (email_list) => {
 };
 
 //RETURN NUMBER OF DAYS BETWEEN TWO UNIX TIMESTAMPS
-const numDaysBetween = function(d1, d2) {
+const numDaysBetween = function (d1, d2) {
   // console.log('today', today)
   var diff = Math.abs(d1 - d2);
   // console.log('diff', diff)
@@ -56,16 +56,34 @@ const numDaysBetween = function(d1, d2) {
 const wordCount = (text) => {
   var wordCount = 0;
   for (var i = 0; i <= text.length; i++) {
-if (text.charAt(i) == ' ') {wordCount++;}
-}
-  if(wordCount >= 7 && wordCount <= 85){
-   return "yes"
-  }else {
-    return "no"
+    if (text.charAt(i) == " ") {
+      wordCount++;
+    }
   }
-}
+  if (wordCount >= 7 && wordCount <= 85) {
+    return "yes";
+  } else {
+    return "no";
+  }
+};
 
-const getEmails = async (offset) => {
+const compare = (a, b) => a.day - b.day;
+
+//WRITE DATA TO CSV FILE
+const toCSV = async (array) => {
+  const csv = new ObjectsToCsv(array.sort(compare));
+  await csv.toDisk(`./90-day-challenge.csv`, {
+    allColumns: false,
+    append: true,
+  });
+};
+
+//CONVERT DATA TO CSV STRING
+const toStringCSV = async (array) => {
+  const csv = new ObjectsToCsv(array.sort(compare)).toString();
+  return csv;
+};
+const getEmails = async (offset, data) => {
   await fetch(
     `https://talk.hyvor.com/api/v1/comments?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&type=comments&limit=250&offset=${offset}`
   )
@@ -74,45 +92,58 @@ const getEmails = async (offset) => {
       emails = res.data.map((user) => {
         return {
           email: user.user.email ? user.user.email.toLowerCase() : "",
-          day: numDaysBetween(DAY1, user.created_at),
+          // day_posted: numDaysBetween(DAY1, user.created_at),
           // unix_timestamp: user.created_at,
           // date_created: new Date(user.created_at * 1000),
+          day_created: user.page.page_identifier,
           wallOfFaith: wordCount(user.markdown),
         };
       });
       return [
         emails,
         emails.map((email) => {
-          return email.email ;
+          return email.email;
         }),
       ];
     })
     .then((emails) => {
-      // console.log(emails[0]);
-      const toCSV = async () => {
-        const csv = new ObjectsToCsv(emails[0]);
-        await csv.toDisk(`./90-day-challenge.csv`, { allColumns: false , append: true});
-
-      };
-
-      toCSV();
+      toCSV(emails[0]);
     });
 };
 
-//MILESTONES: 2250, 3250
 
-let i = 0
-while (i <=3500){
-  try{
-    getEmails(i)
-    i +=  250
-  } catch (e){
-    console.log(e)
-  }
+const getPages = async () => {
+  const pages = await fetch(`https://talk.hyvor.com/api/v1/pages?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&sort=recently_commented`
+  ).then((res) => res.json())
+  .then(pages => 
+    pages.data
+  ).catch(err => {
+    console.log(err)
+  })
 
+  return pages
 }
 
 
 
+//MILESTONES: 2250, 3250
+// const main = () => {
+//   let i = 0;
+//   while (i <= 7000) {
+//     try {
+//       getEmails(i);
+//       i += 250;
+//     } catch (e) {
+//       console.log(e);
+//     }
+//   }
+// };
+
+const main = async () => {
+ const pages = await getPages()
+ console.log(pages)
+}
+
+main();
 
 // numDaysBetween(DAY1, DAY1)

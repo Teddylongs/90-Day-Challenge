@@ -1,0 +1,213 @@
+<style>
+  #calendar {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+  }
+
+  @media only screen and (max-width: 767px) {
+    #calendar {
+      justify-content: space-between;
+    }
+  }
+  .day {
+    border: solid 2px rgba(175, 234, 224, 0.3);
+    -webkit-box-shadow: 10px 15px 12px -4px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 10px 15px 12px -4px rgba(0, 0, 0, 0.4);
+    box-shadow: 10px 15px 12px -4px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    padding: 10px 15px;
+    border-radius: 20px;
+    margin: 5px 5px;
+    transition: all 0.3s ease;
+  }
+
+  .day:hover {
+    transform: translateY(-5px);
+  }
+  .day h4 {
+    margin: 0;
+  }
+
+  .active-week {
+    background: rgba(175, 234, 224, 0.74);
+    border: solid 2px rgba(175, 234, 224, 0.3);
+  }
+  .inactive-week {
+    background: rgba(128, 128, 128, 0.9);
+    border: solid 1px rgba(128, 128, 128, 0.9);
+  }
+
+  .done {
+    background: rgba(229, 206, 111, 0.75);
+    border: rgba(229, 206, 111, 0.75);
+  }
+</style>
+<div id="calendar">
+  <div class="active-week day week-1 done">
+    <a href="https://topeakinsiku.com/walloffaith/week-1">
+      <h4>Week 1</h4>
+    </a>
+  </div>
+  <div class="active-week day week-2 done">
+    <a href="https://topeakinsiku.com/walloffaith/week-2">
+      <h4>Week 2</h4>
+    </a>
+  </div>
+  <div class="active-week day week-3 done">
+    <a href="https://topeakinsiku.com/walloffaith/week-3">
+      <h4>Week 3</h4>
+    </a>
+  </div>
+  <div class="active-week day week-4 done">
+    <a href="https://topeakinsiku.com/walloffaith/week-4">
+      <h4>Week 4</h4>
+    </a>
+  </div>
+  <div class="day" style="width: 25px;"></div>
+  <div class="active-week day day-29">
+    <a href="https://topeakinsiku.com/day-29">
+      <h4>Day 29</h4>
+    </a>
+  </div>
+  <div class="active-week day day-30">
+    <a href="https://topeakinsiku.com/day-30">
+      <h4>Day 30</h4>
+    </a>
+  </div>
+  <div class="active-week day day-31">
+    <a href="https://topeakinsiku.com/day-31">
+      <h4>Day 31</h4>
+    </a>
+  </div>
+  <div class="active-week day day-32">
+    <a href="https://topeakinsiku.com/day-32">
+      <h4>Day 32</h4>
+    </a>
+  </div>
+  <div class="active-week day day-33">
+    <a href="https://topeakinsiku.com/day-33">
+      <h4>Day 33</h4>
+    </a>
+  </div>
+  <div class="active-week day day-34">
+    <a href="https://topeakinsiku.com/day-34">
+      <h4>Day 34</h4>
+    </a>
+  </div>
+  <div class="active-week day day-35">
+    <a href="https://topeakinsiku.com/day-35">
+      <h4>Day 35</h4>
+    </a>
+  </div>
+  <div class="active-week day day-36">
+    <a href="https://topeakinsiku.com/day-36">
+      <h4>Day 36</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-37">
+    <a href="https://topeakinsiku.com/day-37">
+      <h4>Day 37</h4>
+    </a>
+  </div>
+
+  <div class="inactive-week day day-38">
+    <a href="https://topeakinsiku.com/day-38">
+      <h4>Day 38</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-39">
+    <a href="https://topeakinsiku.com/day-39">
+      <h4>Day 39</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-40">
+    <a href="https://topeakinsiku.com/day-40">
+      <h4>Day 40</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-41">
+    <a href="https://topeakinsiku.com/day-41">
+      <h4>Day 41</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-42">
+    <a href="https://topeakinsiku.com/day-42">
+      <h4>Day 42</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-43">
+    <a href="https://topeakinsiku.com/day-43">
+      <h4>Day 43</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-44">
+    <a href="https://topeakinsiku.com/day-44">
+      <h4>Day 44</h4>
+    </a>
+  </div>
+
+  <div class="inactive-week day day-45">
+    <a href="https://topeakinsiku.com/day-45">
+      <h4>Day 45</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-46">
+    <a href="https://topeakinsiku.com/day-46">
+      <h4>Day 46</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-47">
+    <a href="https://topeakinsiku.com/day-47">
+      <h4>Day 47</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-48">
+    <a href="https://topeakinsiku.com/day-48">
+      <h4>Day 48</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-49">
+    <a href="https://topeakinsiku.com/day-49">
+      <h4>Day 49</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-50">
+    <a href="https://topeakinsiku.com/day-50">
+      <h4>Day 50</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-51">
+    <a href="https://topeakinsiku.com/day-51">
+      <h4>Day 51</h4>
+    </a>
+  </div>
+
+  <div class="inactive-week day day-52">
+    <a href="https://topeakinsiku.com/day-52">
+      <h4>Day 52</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-53">
+    <a href="https://topeakinsiku.com/day-53">
+      <h4>Day 53</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-54">
+    <a href="https://topeakinsiku.com/day-54">
+      <h4>Day 54</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-55">
+    <a href="https://topeakinsiku.com/day-55">
+      <h4>Day 55</h4>
+    </a>
+  </div>
+  <div class="inactive-week day day-56">
+    <a href="https://topeakinsiku.com/day-56">
+      <h4>Day 56</h4>
+    </a>
+  </div>
+  <div style="display: none"></div>
+</div>
