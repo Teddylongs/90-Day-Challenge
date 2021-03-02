@@ -116,7 +116,7 @@ const getEmails = async (offset, data) => {
 
 const getPages = async () => {
   const pages = await fetch(
-    `https://talk.hyvor.com/api/v1/pages?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&sort=recently_commented`
+    `https://talk.hyvor.com/api/v1/pages?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&sort=most_commented&limit=250`
   )
     .then((res) => res.json())
     .then((pages) => pages.data)
@@ -153,26 +153,24 @@ const getComments = async (offset = 0, page_identifier) => {
     .then((emails) => {
       return emails[0];
     });
-// console.log(comments)
+  // console.log(comments)
   return comments;
 };
 
- 
 const getAllComments = async (page_identifier, comment_count) => {
-  let i = 0
-  let commentsList = []
-  while (i < comment_count)  {
+  let i = 0;
+  let commentsList = [];
+  while (i < comment_count) {
     try {
-      const batch = await getComments(i, page_identifier)
-      commentsList = [...commentsList, batch]
-      i = i + 250
-    } catch (err){
-      console.log(err)
+      const batch = await getComments(i, page_identifier);
+      commentsList = [...commentsList, batch];
+      i = i + 250;
+    } catch (err) {
+      console.log(err);
     }
-    
   }
-  return commentsList
-}
+  return commentsList;
+};
 //MILESTONES: 2250, 3250
 // const main = () => {
 //   let i = 0;
@@ -186,20 +184,37 @@ const getAllComments = async (page_identifier, comment_count) => {
 //   }
 // };
 
+const count_duplicates = (comments) => {
+  const counter = {};
+  comments.forEach((comment) => {
+    var key = comment.email;
+    counter[key] = (counter[key] ? counter[key] : 0) + 1;
+    // console.log(counter);
+  });
+  return counter;
+};
+
 const populatePageData = async (pages) => {
-  for (let i =0; i < pages.length; i++){
+  for (let i = 0; i < pages.length; i++) {
     // console.log(pages[i])
-    pages[i].data = await getAllComments(pages[i].page_identifier, pages[i].comments_count)
-    console.log(pages[i].data)
+    pages[i].comments = await getAllComments(
+      pages[i].page_identifier,
+      pages[i].comments_count
+    ).then(comments => {
+      const combinedComments = [].concat.apply([], comments)
+      return combinedComments
+    });
+    // console.log(pages[i].data)
   }
   // page.data = await getAllComments(page.page_identifier, page.comment_count)
-  // console.log(page.data)
-  console.log(pages)
-}
+  // console.log(pages[1].data)
+  // console.log(pages);
+  console.log(count_duplicates(pages[0].comments.filter((comment) => comment.wall_of_faith === 'yes')))
+};
 
 const main = async () => {
-  let data = await getPages()
-  populatePageData(data) 
+  let pages = await getPages();
+  populatePageData(pages);
 
   // const allComments = await getAllComments("day-1", 500)
   // console.log(allComments)
