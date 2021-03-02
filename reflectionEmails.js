@@ -184,6 +184,16 @@ const getAllComments = async (page_identifier, comment_count) => {
 //   }
 // };
 
+const compareTopCommenters = (a, b) => {
+  if (a[1] < b[1]) {
+    return -1;
+  } else if (a[1] > a[1]) {
+    return 1;
+  } else {
+    return 0;
+  }
+};
+
 const count_duplicates = (comments) => {
   const counter = {};
   comments.forEach((comment) => {
@@ -200,16 +210,22 @@ const populatePageData = async (pages) => {
     pages[i].comments = await getAllComments(
       pages[i].page_identifier,
       pages[i].comments_count
-    ).then(comments => {
-      const combinedComments = [].concat.apply([], comments)
-      return combinedComments
+    ).then((comments) => {
+      const combinedComments = [].concat.apply([], comments);
+      return combinedComments;
     });
     // console.log(pages[i].data)
   }
   // page.data = await getAllComments(page.page_identifier, page.comment_count)
   // console.log(pages[1].data)
   // console.log(pages);
-  console.log(count_duplicates(pages[0].comments.filter((comment) => comment.wall_of_faith === 'yes')))
+  console.log(
+    Object.entries(
+      count_duplicates(
+        pages[0].comments.filter((comment) => comment.wall_of_faith === "yes")
+      )
+    ).sort(compareTopCommenters).pop()
+  );
 };
 
 const main = async () => {
