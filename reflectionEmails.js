@@ -171,18 +171,32 @@ const getAllComments = async (page_identifier, comment_count) => {
   }
   return commentsList;
 };
-//MILESTONES: 2250, 3250
-// const main = () => {
-//   let i = 0;
-//   while (i <= 7000) {
-//     try {
-//       getEmails(i);
-//       i += 250;
-//     } catch (e) {
-//       console.log(e);
-//     }
-//   }
-// };
+
+const populatePages = async (pages) => {
+  console.log("Populating Pages")
+  for (let i = 0; i < pages.length; i++) {
+    // console.log(pages[i])
+    pages[i].comments = await getAllComments(
+      pages[i].page_identifier,
+      pages[i].comments_count
+    ).then((comments) => {
+      const combinedComments = [].concat.apply([], comments);
+      return combinedComments;
+    });
+    // console.log(pages[i].data)
+  }
+  // page.data = await getAllComments(page.page_identifier, page.comment_count)
+  // console.log(pages[1].data)
+  // console.log(pages);
+
+  // console.log(
+  //   Object.entries(
+  //     count_duplicates(
+  //       pages[0].comments.filter((comment) => comment.wall_of_faith === "yes")
+  //     )
+  //   ).sort(compareTopCommenters).pop()
+  // );
+};
 
 const compareTopCommenters = (a, b) => {
   if (a[1] < b[1]) {
@@ -204,34 +218,28 @@ const count_duplicates = (comments) => {
   return counter;
 };
 
-const populatePageData = async (pages) => {
-  for (let i = 0; i < pages.length; i++) {
-    // console.log(pages[i])
-    pages[i].comments = await getAllComments(
-      pages[i].page_identifier,
-      pages[i].comments_count
-    ).then((comments) => {
-      const combinedComments = [].concat.apply([], comments);
-      return combinedComments;
-    });
-    // console.log(pages[i].data)
-  }
-  // page.data = await getAllComments(page.page_identifier, page.comment_count)
-  // console.log(pages[1].data)
-  // console.log(pages);
-  console.log(
-    Object.entries(
-      count_duplicates(
-        pages[0].comments.filter((comment) => comment.wall_of_faith === "yes")
-      )
-    ).sort(compareTopCommenters).pop()
-  );
-};
+const getHonourRoll = (pagesArray) => {
+  console.log("Getting Honour Roll")
+  // console.log(pagesArray)
+  pagesArray.forEach((page) => {
+    const commentsCount = count_duplicates(page.comments.filter((comment) => comment.wall_of_faith === "yes"))
+    const entries = Object.entries(commentsCount).sort(compareTopCommenters)
+    
+    page.honorRoll = entries.slice(entries.length -3,entries.length)
+
+    console.log(page.page_identifier, page.honorRoll)
+    
+  })
+}
+
 
 const main = async () => {
-  let pages = await getPages();
-  populatePageData(pages);
-
+  let pages = await getPages().then(async (pagesData) => {
+    await populatePages(pagesData)
+    return pagesData
+  }).catch(err => console.log(err));
+  // console.log(pages)
+  getHonourRoll(pages.slice(0,7))
   // const allComments = await getAllComments("day-1", 500)
   // console.log(allComments)
 };
