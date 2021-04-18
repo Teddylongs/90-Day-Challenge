@@ -206,7 +206,7 @@ const toCSV = async (array, filename) => {
 
     for (let i = 0; i < manifest.length; i++){
         manifest[i] = manifest[i].map(day => day.email)
-        manifest[i] = [`day ${i}`, ...manifest[i]]
+        manifest[i] = [`day ${i+1}`, ...manifest[i]]
     }
    toCSV(manifest, 'manifest.csv')
 

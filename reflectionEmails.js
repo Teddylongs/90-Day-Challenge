@@ -74,12 +74,12 @@ const compare = (a, b) => a.day - b.day;
 //WRITE DATA TO CSV FILE
 const toCSV = async (array, filename) => {
   const interim = array.sort(compare)
-  console.log(interim)
-  // const csv = new ObjectsToCsv(interim);
-  // await csv.toDisk(`${filename}`, {
-  //   allColumns: false,
-  //   append: true,
-  // });
+  // console.log(interim)
+  const csv = new ObjectsToCsv(interim);
+  await csv.toDisk(`${filename}`, {
+    allColumns: false,
+    append: true,
+  });
 };
 
 //CONVERT DATA TO CSV STRING
@@ -261,12 +261,12 @@ const main = async () => {
     return pagesData
   }).catch(err => console.log(err));
 
-  console.log(pages)
+  // console.log(pages)
 const HonorRoll = getHonourRoll(getAllCommentsData(pages))
- console.log(HonorRoll)
+//  console.log(HonorRoll)
 
-//  toCSV(HonorRoll[0], '90DC-HonorRoll.csv')
-//  toCSV(HonorRoll[1], '90DC-NameList.csv')
+ toCSV(HonorRoll[0], '90DC-HonorRoll.csv')
+ toCSV(HonorRoll[1], '90DC-NameList.csv')
 
   // console.log(pages)
   // getHonourRoll(pages)
