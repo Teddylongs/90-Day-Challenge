@@ -32,7 +32,7 @@ const count_responses = (email_list) => {
   let emailCount = [];
   for (let i = 0; i < email_list.length; i++) {
     let email = email_list[i];
-    if (!checkedEmails.includes(email)) {
+    if (!checkedEmails.includes(email)) { 
       checkedEmails = [...checkedEmails, email];
       emailCount[checkedEmails.indexOf(email)] = {
         email,
@@ -72,12 +72,14 @@ const wordCount = (text) => {
 const compare = (a, b) => a.day - b.day;
 
 //WRITE DATA TO CSV FILE
-const toCSV = async (array) => {
-  const csv = new ObjectsToCsv(array.sort(compare));
-  await csv.toDisk(`./90-day-challenge.csv`, {
-    allColumns: false,
-    append: true,
-  });
+const toCSV = async (array, filename) => {
+  const interim = array.sort(compare)
+  console.log(interim)
+  // const csv = new ObjectsToCsv(interim);
+  // await csv.toDisk(`${filename}`, {
+  //   allColumns: false,
+  //   append: true,
+  // });
 };
 
 //CONVERT DATA TO CSV STRING
@@ -128,6 +130,7 @@ const getPages = async () => {
 };
 
 const getComments = async (offset = 0, page_identifier) => {
+  console.log(`Fetching Comments in page ${page_identifier}`)
   const comments = await fetch(
     `https://talk.hyvor.com/api/v1/comments?website_id=2837&api_key=f8990b031438a0e374da7e2b6ec1945eab4e14699c96361fc95cbffcf4a5&type=comments&limit=250&offset=${offset}&page_identifier=${page_identifier}`
   )
@@ -135,6 +138,7 @@ const getComments = async (offset = 0, page_identifier) => {
     .then((res) => {
       const batch = res.data.map((user) => {
         return {
+          name: user.user.name ? user.user.name.toUpperCase() : "",
           email: user.user.email ? user.user.email.toLowerCase() : "",
           // day_posted: numDaysBetween(DAY1, user.created_at),
           // unix_timestamp: user.created_at,
@@ -169,6 +173,7 @@ const getAllComments = async (page_identifier, comment_count) => {
       console.log(err);
     }
   }
+  // console.log(commentsList)
   return commentsList;
 };
 
@@ -181,6 +186,7 @@ const populatePages = async (pages) => {
       pages[i].comments_count
     ).then((comments) => {
       const combinedComments = [].concat.apply([], comments);
+      // console.log(combinedComments)
       return combinedComments;
     });
     // console.log(pages[i].data)
@@ -209,37 +215,62 @@ const compareTopCommenters = (a, b) => {
 };
 
 const count_duplicates = (comments) => {
+  console.log('Checking for Duplicates')
   const counter = {};
+  const manifest = {}
   comments.forEach((comment) => {
+    var name = comment.name
+    var email = comment.email
+    manifest[name] = email
     var key = comment.email;
     counter[key] = (counter[key] ? counter[key] : 0) + 1;
+    // counter[key2] = key2
     // console.log(counter);
   });
-  return counter;
+  // console.log(manifest)
+  return [counter, manifest];
 };
 
-const getHonourRoll = (pagesArray) => {
+const getHonourRoll = (commentsArray) => {
   console.log("Getting Honour Roll")
   // console.log(pagesArray)
-  pagesArray.forEach((page) => {
-    const commentsCount = count_duplicates(page.comments.filter((comment) => comment.wall_of_faith === "yes"))
-    const entries = Object.entries(commentsCount).sort(compareTopCommenters)
-    
-    page.honorRoll = entries.slice(entries.length -3,entries.length)
-
-    console.log(page.page_identifier, page.honorRoll)
-    
-  })
+  // let validComments = commentsArray
+  let validComments = commentsArray.filter(comment => comment.wall_of_faith === 'yes')
+  validComments = count_duplicates([...validComments])
+  const TopCommenters = Object.entries(validComments[0]).sort(compareTopCommenters)
+  return [TopCommenters.reverse(), Object.entries(validComments[1])]
 }
+
+
+const getAllCommentsData = (pagesArray) => {
+  let list = []
+  pagesArray.forEach(page => {
+    // console.log(page)
+    // console.log('going to concat now')
+    list = list.concat(page.comments)
+  })
+  return list
+}
+
 
 
 const main = async () => {
   let pages = await getPages().then(async (pagesData) => {
     await populatePages(pagesData)
+    // console.log(pagesData)
     return pagesData
   }).catch(err => console.log(err));
+
+  console.log(pages)
+const HonorRoll = getHonourRoll(getAllCommentsData(pages))
+ console.log(HonorRoll)
+
+//  toCSV(HonorRoll[0], '90DC-HonorRoll.csv')
+//  toCSV(HonorRoll[1], '90DC-NameList.csv')
+
   // console.log(pages)
-  getHonourRoll(pages.slice(0,7))
+  // getHonourRoll(pages)
+  // getTopCommenters(getAllCommentsData(pages))
   // const allComments = await getAllComments("day-1", 500)
   // console.log(allComments)
 };
